@@ -1,6 +1,6 @@
 const SubSection = require("../models/SubSection");
 const Section = require("../models/Section");
-const cloudinarySender = require("../utils/imageUploader");
+const {cloudinarySender} = require("../utils/imageUploader");
 require("dotenv").config()
 
 exports.creatSection=async(req,res)=>{
