@@ -1,11 +1,14 @@
 const cloudinary = require("cloudinary").v2;
 
-const cloudinarySender=async(file,folder)=>{
-    await cloudinary.config({
-        cloud_name:process.env.CLOUD_NAME,
-        secret_key:process.env.SECRET_KEY,
-        folder_name:process.env.FOLDER_NAME,
-    })
+const uploadImageToCloudinary = async (file, folder, height, quality) => {
+  const options = { folder };
+  if (height) {
+    options.height = height;
+  }
+  if (quality) {
+    options.quality = quality;
+  }
+  options.resource_type = "auto";
 
-    await cloudinary.uploader.upload(file.tempFilePath , {folder})
-}
+  return await cloudinary.uploader.upload(file.tempFilePath, options);
+};

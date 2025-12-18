@@ -12,7 +12,7 @@ exports.auth=async(req,res,next)=>{
         return res.status(400).json({success:false,message:"token not found "})
     }
     //token verify  
-        const decode = jwt.verify(token,process.env.SECRET_KEY)
+        const decode = jwt.verify(token,process.env.JWT_SECRET)
         req.user = decode;
         next();
  

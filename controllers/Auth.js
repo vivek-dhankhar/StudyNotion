@@ -5,7 +5,7 @@ const jwt = require("jsonwebtoken");
 require("dotenv").config();
 
 //otp controller------------------------------------------------------------
-exports.sendOTP = async(req,res)=>{
+exports.sendotp = async(req,res)=>{
     try {
         const {email} = req.body;
         
@@ -47,7 +47,7 @@ exports.sendOTP = async(req,res)=>{
 }
 
 // singnUp controller--------------------------------------------------------------
-exports.signUp=async(req,res)=>{
+exports.signup=async(req,res)=>{
     try {
         //data fetch from req body
     const {firstName,lastName,email,password,confirmPassword,accountType,contactNumber,otp} = req.body;
@@ -103,7 +103,7 @@ exports.signUp=async(req,res)=>{
 }
 
 //signIN controller------------------------------------
-exports.signIn=async(req,res)=>{
+exports.login=async(req,res)=>{
     try {
         //get email and pass from body
         const {email , password}= req.body;
