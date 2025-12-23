@@ -1,5 +1,6 @@
 const User = require('../models/User');
 const mailSender = require("../utils/mailSender")
+const bcrypt = require("bcrypt")
 
 
 //ResetPassword Token------------------------------------------------------------------
@@ -25,7 +26,7 @@ exports.resetPasswordToken=async(req,res)=>{
         //send mail 
         await mailSender(email , "reset password link" , `reset password link :  ${url}`)
         //send response
-        return res.status(200).json({success:true, message:"reset password link send sucessfully"})
+        return res.status(200).json({success:true, message:"reset password link send sucessfully" , token:`${token}`})
     }
     catch(error){
         return res.status(500).json({success:false, message:"something went wrong while sending reset password link"})
@@ -44,12 +45,12 @@ exports.resetPassword=async(req,res)=>{
         //get user detail from db using token
         const userDetails = await User.findOne({token:token})
         //if no entry invalid token
-        if(!token){
+        if(!userDetails){
             return res.status(401).json({success:false,message:"invalid token"})
         }
         //token time check
-        if(userDetails.resetPasswordExpires < Date.now){
-            return res.status({success:false, message:"token expired"})
+        if(userDetails.resetPasswordExpires < Date.now()){
+            return res.status(400).json({success:false, message:"token expired"})
         }
         // hash pass
         const hashedPassword = await bcrypt.hash(password , 10)

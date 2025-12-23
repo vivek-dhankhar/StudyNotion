@@ -30,14 +30,17 @@ const UserSchema = new mongoose.Schema({
         require:true,
         ref:"Profile",
     },
-    courses:{
+    courses:[{
         type:mongoose.Schema.Types.ObjectId,
         ref:"Course"
-    },
+    }],
     image:{
         type:String,
         required:true
     },
+    token: {
+			type: String,
+		},
     courseProgress:[
         {
             type:mongoose.Schema.Types.ObjectId,

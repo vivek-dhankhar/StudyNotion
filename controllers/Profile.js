@@ -1,5 +1,6 @@
 const Profile = require("../models/Profile")
 const User = require("../models/User")
+const {uploadImageToCloudinary} = require("../utils/imageUploader")
 
 //directly update profile bcz during singUp we have already created profile-------------
 exports.updateProfile=async(req,res)=>{
@@ -61,7 +62,7 @@ exports.getAllUserDetails=async(req,res)=>{
             return res.status(404).json({success:false, message:"user not found"})
         }
         //return response
-        return res.status(200).json({success:true , message:"user details fetched"})
+        return res.status(200).json({success:true , message:"user details fetched" , data:userDetails})
     } catch (error) {
         return res.status(500).json({sucess:false,message:"unable to fetch user details"})
     }

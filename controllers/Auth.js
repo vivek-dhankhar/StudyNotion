@@ -3,19 +3,22 @@ const OTP = require('../models/Otp')
 const otpGenerator = require('otp-generator');
 const jwt = require("jsonwebtoken");
 require("dotenv").config();
+const bcrypt = require("bcrypt");
+const Profile = require("../models/Profile")
+
 
 //otp controller------------------------------------------------------------
 exports.sendotp = async(req,res)=>{
     try {
         const {email} = req.body;
         
-        const emailExists = User.findOne({email})
+        const emailExists = await User.findOne({email})
 
         if(emailExists){
-            return res.status(401).json({sucess:false , message:";user already exists"})
+            return res.status(401).json({sucess:false , message:"user already exists"})
         }
     
-        let otp = otpGenerator.generate(6,{
+        var otp = otpGenerator.generate(6,{
             upperCaseAlphabets:false,
             lowerCaseAlphabets:false,
             specialChars:false,
@@ -38,7 +41,7 @@ exports.sendotp = async(req,res)=>{
 
         console.log(otpBody)
         
-        return res.status(200).json({sucess:true , message:"otp send sucessfully"})
+        return res.status(200).json({sucess:true , message:"otp send sucessfully", otpBody})
 
     } catch (error) {
         console.log("error in sending otp" , error)
@@ -50,18 +53,18 @@ exports.sendotp = async(req,res)=>{
 exports.signup=async(req,res)=>{
     try {
         //data fetch from req body
-    const {firstName,lastName,email,password,confirmPassword,accountType,contactNumber,otp} = req.body;
+    const {firstName,lastName,email,password,confirmPassword,accountType,otp} = req.body;
     //validate kro 
-    if(!firstName|| !lastName||!email||!password||!confirmPassword||!accountType||!contactNumber||!otp){
+    if(!firstName|| !lastName||!email||!password||!confirmPassword||!accountType||!otp){
         return res.status(403).json({sucess:false , message:"enter all details"})
     }
     //2 password match karlo
-    if(password!=confirmPassword){
+    if(password!==confirmPassword){
         return res.status(400).json({sucess:false, message:"password does not match , Try Again"})
     }
     //check user already exists
     const userExists = await User.findOne({email})
-    if(userExist){
+    if(userExists){
         return res.status(400).json({sucess:false, message:"User already exists"})
     }
     //find most recent otp from the db 
@@ -70,7 +73,7 @@ exports.signup=async(req,res)=>{
     if(recentOtp.length == 0){
         return res.status(400).json({sucess:false,message:"otp not found"})
     }
-    if(otp !== recentOtp.otp){
+    if(otp !== recentOtp[0].otp){
         return res.status(400).json({sucess:false, message:"invalid otp"})
     }
     //hash the password 
@@ -89,7 +92,6 @@ exports.signup=async(req,res)=>{
         email,
         password:hashedPassword,
         accountType,
-        contactNumber,
         additionalDetails:profileDetails._id,
         image:`https://api.dicebear.com/5.x/initials/svg?seed=${firstName} ${lastName}`
     })
@@ -112,7 +114,7 @@ exports.login=async(req,res)=>{
             return res.status(403).json({sucess:false, message:"enter all details"})
         }
         //find email in db
-        const user = awaitUser.findOne({email}).populate("additionalDetails")
+        const user = await User.findOne({email}).populate("additionalDetails")
         //if not exist throw error 
         if(!user){
             return res.status(402).json({sucess:false, message:"user does not exists , please signup"})
@@ -124,7 +126,7 @@ exports.login=async(req,res)=>{
         }
         //create a jwt
         const payload = {id:user._id ,email:user.email, accountType:user.accountType }
-        const options = {expires:"3d"}
+        const options = {expiresIn:"3d"}
         const token = jwt.sign(payload, process.env.JWT_SECRET,options)
 
         user.token = token ;

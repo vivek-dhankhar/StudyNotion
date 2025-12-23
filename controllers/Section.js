@@ -13,7 +13,7 @@ exports.createSection=async(req,res)=>{
         const newSection = await Section.create({sectionName})
         //update course with section (Objid)
         const updateCourseDetails = await Course.findByIdAndUpdate(courseId ,
-                                                             {courseContent:newSection._id},
+                                                             {$push: { courseContent: newSection._id }},
                                                               {new:true}
                                                              )
         //return response
